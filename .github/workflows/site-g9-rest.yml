@@ -1,0 +1,51 @@
+name: G9 eight-seed rest versus privileged reset
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/site-g9-rest.yml'
+      - 'online.js'
+      - 'SITE_G9_PROTOCOL.md'
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Evaluate quiet and loud objectives under zero and strong loss
+        run: |
+          mkdir -p results
+          node - <<'NODE'
+          const fs=require('node:fs'),vm=require('node:vm');
+          const elements=new Map();
+          function get(id){
+            if(!elements.has(id))elements.set(id,{
+              value:id==='epoch'?'20':'0',checked:false,disabled:false,textContent:'',
+              style:{},addEventListener(){},
+              getBoundingClientRect(){return {width:300,height:220}},
+              getContext(){return {setTransform(){},clearRect(){},beginPath(){},moveTo(){},
+                lineTo(){},stroke(){},fillText(){},setLineDash(){}}}
+            });
+            return elements.get(id);
+          }
+          const window={addEventListener(){}},document={getElementById:get};
+          const context={window,document,console,Float64Array,Math,Number,Array,JSON,Promise};
+          vm.createContext(context);
+          vm.runInContext(fs.readFileSync('online.js','utf8'),context);
+          const reports={};
+          for(const loss of [0,.07]){
+            const result=window.__onlineBeachModel.batchRest(loss,.0005,.003,3);
+            if(result.seeds.join(',')!=='1001,1009,1013,1019,1021,1031,1033,1039')
+              throw Error('wrong seeds');
+            if(result.rows.length!==8*2*8)throw Error('incomplete rest audit');
+            for(const row of result.rows)if(!Number.isFinite(row.receiverPowerDb)||!Number.isFinite(row.finalLossRatio))throw Error('nonfinite');
+            reports[loss]=result;
+            console.log('REST',loss,JSON.stringify(result.summary));
+          }
+          fs.writeFileSync('results/g9_rest_8seed.json',JSON.stringify(reports,null,2)+'\n');
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9-rest-8seed
+          path: results/g9_rest_8seed.json
