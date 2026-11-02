@@ -69,6 +69,40 @@ function run(seed=41,task='quiet',loss=0,epochs=20,step=.0005,teacherBeta=.003,t
  }
  return {seed,task,loss,teacherBeta,trackingT,step,target,baseOutput,out};
 }
+// G9 supplementary held-out rest audit. Same seeds as the agent benchmark;
+// loud receiver-power dB is NOT the complex-target task-loss metric.
+const BATCH_SEEDS=[1001,1009,1013,1019,1021,1031,1033,1039];
+function median(x){const a=x.slice().sort((x,y)=>x-y),n=a.length;return n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2}
+function batchRest(loss=0,step=.0005,teacherBeta=.003,trackingT=3){
+ const rows=[],cases=['frozen','track3','recalib','restPhysical','gd','natural','off','twoPhase'];
+ for(const task of ['quiet','loud'])for(const seed of BATCH_SEEDS){
+  const result=run(seed,task,loss,20,step,teacherBeta,trackingT);
+  const h0=result.out.frozen.rows[0].h;
+  const p0=energy(field(h0,SOURCE,[1,0],loss)[RECEIVER]);
+  for(const kind of cases){
+   const arm=result.out[kind],last=arm.rows.at(-1);
+   const p=energy(field(last.h,SOURCE,[1,0],loss)[RECEIVER]);
+   rows.push({task,seed,kind,finalLossRatio:arm.ratio,
+    receiverPowerDb:10*Math.log10(Math.max(p,1e-30)/Math.max(p0,1e-30))});
+  }
+ }
+ const summary={};
+ for(const task of ['quiet','loud']){
+  summary[task]={};
+  for(const kind of cases){
+   const a=rows.filter(x=>x.task===task&&x.kind===kind);
+   summary[task][kind]={
+    medianPowerDb:median(a.map(x=>x.receiverPowerDb)),
+    medianTaskLossRatio:median(a.map(x=>x.finalLossRatio)),
+    receiverPowerImproved:a.filter(x=>task==='quiet'?x.receiverPowerDb<0:x.receiverPowerDb>0).length,
+    targetLossDecreased:a.filter(x=>x.finalLossRatio<1).length
+   };
+  }
+ }
+ return {protocol:'SITE_G9_PROTOCOL.md',model:'synthetic 48-node complex wave operator',
+  seeds:BATCH_SEEDS,tasks:['quiet','loud'],loss,step,teacherBeta,trackingT,
+  warning:'Physical-rest arm has a second bed update and extra teacher-free measurements. Reset arm freezes bed during θ replacement.',summary,rows};
+}
 const $=id=>document.getElementById(id);
 const colors={frozen:'#65e5d1',track3:'#ffcc79',recalib:'#a6a6ff',restPhysical:'#ffa9a0',gd:'#9af0a6',natural:'#ef8da4',off:'#7a9ca5',twoPhase:'#d4bcf9'};
 const labels={frozen:'Frozen θ',track3:'Teacher-tracking θ',recalib:'Privileged θ reset (bed frozen)',restPhysical:'Active rest (bed moves; T tracking)',gd:'Exact gradient (oracle)',natural:'Plain field energy',off:'Teacher off',twoPhase:'External two-phase subtraction'};
@@ -121,7 +155,26 @@ function exportData(){
  a.href=url;a.download='beach-online-memory.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 for(const [id,out,digits,suffix] of [['step','stepOut',4,''],['teacher','teacherOut',4,''],['track','trackOut',0,' epochs']]){$(id).addEventListener('input',()=>$(out).textContent=Number($(id).value).toFixed(digits)+suffix)}
-$('run').addEventListener('click',execute);$('export').addEventListener('click',exportData);$('epoch').addEventListener('input',()=>{$('epochOut').textContent=$('epoch').value;draw()});window.addEventListener('resize',draw);
+$('run').addEventListener('click',execute);$('export').addEventListener('click',exportData);$('epoch').addEventListener('input',()=>{$('epochOut').textContent=$('epoch').value;draw()});// Explicit held-out audit rather than best-looking one-seed examples.
+async function runBatchRest(){
+ const button=$('batchRest');
+ button.disabled=true;$('batchRestStatus').textContent='Computing eight fixed seeds × quiet/loud × eight writer arms…';
+ await new Promise(ok=>requestAnimationFrame(ok));
+ try{
+  const report=batchRest(Number($('loss').value),Number($('step').value),
+    Number($('teacher').value),Number($('track').value));
+  let html='';
+  for(const key of ['frozen','track3','recalib','restPhysical','gd']){
+   const q=report.summary.quiet[key],l=report.summary.loud[key];
+   html+='<tr><td>'+labels[key]+'</td><td>'+num(q.medianPowerDb,2)+' dB</td><td>'+num(l.medianPowerDb,2)+' dB</td><td>'+num(q.medianTaskLossRatio,3)+' / '+num(l.medianTaskLossRatio,3)+'</td></tr>';
+  }
+  $('batchRestRows').innerHTML=html;
+  $('batchRestStatus').textContent='Eight fixed seeds, both targets. Negative power dB is quieting; positive power dB is amplification. Loud task-loss ratio evaluates a separate complex target. The rest arm gets a second material update and extra forward-wave measurements.';
+ }catch(e){$('batchRestStatus').textContent='Batch failed: '+e;throw e}
+ finally{button.disabled=false}
+}
+$('batchRest').addEventListener('click',runBatchRest);
+window.addEventListener('resize',draw);
 window.__onlineBeachDiagnostics=()=>({ready:!!latest,task:latest?.task,loss:latest?.loss,seed:latest?.seed,step:latest?.step,teacherBeta:latest?.teacherBeta,trackingT:latest?.trackingT,ratios:latest?Object.fromEntries(Object.entries(latest.out).map(([key,v])=>[key,v.ratio])):null,epoch:Number($('epoch').value)});
-window.__onlineBeachModel={run};
+window.__onlineBeachModel={run,batchRest};
 })();
