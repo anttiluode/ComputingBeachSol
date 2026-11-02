@@ -1,0 +1,49 @@
+name: G6 frozen single-exposure stress memory
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/confirm-g6.yml'
+      - 'beach/g6_memory.py'
+      - 'PREREG_G6.md'
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Reproduce 16 preregistered held-out G6 seeds
+        run: OPENBLAS_NUM_THREADS=1 python -m beach.g6_memory --phase confirm --out results/g6_reproduced.json
+      - name: Check fixed protocol and numerical integrity (hypothesis failures are reported, not hidden)
+        run: |
+          python - <<'PY'
+          import json, math
+          r=json.load(open('results/g6_reproduced.json'))
+          assert r['protocol']=='PREREG_G6.md'
+          assert r['seeds']==list(range(1600,1616))
+          assert r['alpha']==.65 and r['baseline_episodes']==12
+          assert r['teacher_ratio']==.02 and r['step_norm']==.025
+          assert r['global_projection_is_physical'] is False
+          assert len(r['per_seed'])==16
+          s=r['summary']
+          assert s['max_algebra_error']<1e-9
+          assert s['max_material_sum_error']<1e-10
+          assert set(s['gates'])=={
+              'G6_A_energy_algebra','G6_B_internal_baseline',
+              'G6_C_signed_teacher','G6_D_numerical_conservation',
+              'G6_E_local_flux','G6_F_drift_recovery'}
+          for item in r['per_seed']:
+              assert math.isfinite(item['base_loss'])
+              for v in item['results'].values():
+                  assert math.isfinite(v['loss_ratio'])
+          print('Locked G6 verdict:', s['gates'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g6-locked-heldout
+          path: results/g6_reproduced.json
