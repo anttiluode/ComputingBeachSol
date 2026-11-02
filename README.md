@@ -1,5 +1,15 @@
 # ComputingBeachSol — a wave writes a medium, then a ping reads its history
 
+
+## Live browser experiment — memory drift over 20 exposures
+
+**[Open Memory Drift: live controls and plots](https://anttiluode.github.io/ComputingBeachSol/online.html)** · [Source HTML](online.html) · [Wave-operator JavaScript](online.js) · [Model guide](PAGES_LAB.md).
+
+Claude's ComputingBeachClaude G7 raised the next real difficulty: the remembered normal stress can become stale after several updates, while a rapidly tracking threshold may learn the teacher away. The new separate browser lab recomputes a 48-node **complex wave operator** each epoch and compares seven matched controllers across 20 material updates. It shows receiver loss, gradient alignment, material profiles and an exportable per-epoch JSON ledger. Try **quiet versus loud**, **no versus strong wave loss**, and the baseline-tracking timescale. The page is cross-linked from the original shore animation.
+
+**Claim boundary:** this is a new synthetic browser diagnostic, NOT the main 288-cell beach solver, Claude's 2D sand, the preregistered Python G6-G8 experiments, or real sediment. It uses a reciprocal receiver-launched numerical teaching field and externally matched material steps; a separate teacher-free recalibration control pays an extra forward wave solve. The purpose is to exhibit failure modes, not assert passive beach learning.
+
+
 ## November 2: G8 — replace runaway potential with neighbour-edge memory
 
 **[G8 frozen results](G8_RESULTS.md) · [G8 preregistration](PREREG_G8.md) · [CI reproduction](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41416660126)**
