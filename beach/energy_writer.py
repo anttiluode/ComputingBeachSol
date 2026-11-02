@@ -74,13 +74,15 @@ def test_case(beach,seed,ratio=.02,threshold_fraction=0,steps=310,step_norm=.025
                 unconstrained=score(raw),projected=score(minus),
                 conservative_downhill=score(downhill),
                 forward_only=score(forward_only),single_plus=score(single_plus),
+                forward_only_conserved=score(forward_only-forward_only.mean()),
+                single_plus_conserved=score(single_plus-single_plus.mean()),
                 mass_change_projected=float(np.sum(minus)),
                 mass_change_conservative=float(np.sum(downhill)))
 
 
 def summarize(records):
     out={}
-    for branch in ('unconstrained','projected','conservative_downhill','forward_only','single_plus'):
+    for branch in ('unconstrained','projected','conservative_downhill','forward_only','single_plus','forward_only_conserved','single_plus_conserved'):
         c=np.array([r[branch]['cosine'] if r[branch]['cosine'] is not None else np.nan for r in records])
         l=np.array([r[branch]['ratio'] if r[branch]['ratio'] is not None else np.nan for r in records])
         out[branch]=dict(mean_cosine=float(np.nanmean(c)),median_cosine=float(np.nanmedian(c)),
