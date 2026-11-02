@@ -31,3 +31,9 @@ Site shows both the median receiver-power change in dB over eight seeds *and* ac
 - Material-read counts are reported separately from storm-proposal wave solves. 200 candidates means 201 receiver-read solves per seed/shape plus additional storm generation.
 - The active physical-rest arm (if shown) must count additional forward-only wave solves, extra material movement, and an externally supplied teacher/rest gate.
 - Everything is synthetic and browser-local. No physical teacher propagation, true Exner sediment dynamics, actual open/radiating boundary, or demonstrated agent-free task optimization.
+
+## Supplementary fixed multi-seed *online rest* check (added before measurement)
+
+In addition to the trial-agent suite, run the **existing** online.js 20-epoch arms on the same eight seed list for both quiet/loud targets at loss=0 (lossless) and loss=0.07 (strongly damped), using fixed step=0.0005, teacherBeta=0.003 and T=3. For each arm, report both median receiver power dB and median task loss ratio, because the site's *loud* target is a **complex amplitude** objective, not simply maximize receiver power. Compare frozen, T3 teacher-tracking, privileged recalibration, active rest, and exact gradient.
+
+No pass threshold is asserted for these exploratory additional arms. Do not confuse an extra material-changing rest step (and extra forward measurements) with an equal-resource teacher-only update. Report the number of useful cases and preserve any negative or task-asymmetric results.
