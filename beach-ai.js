@@ -222,20 +222,34 @@ function renderAnswer(answer){
   edge.style.strokeWidth=String(2+6*Math.max(matrix[a],matrix[b]));
  }
 }
+function clearReadout(){
+ $('response').textContent='—';
+ $('prediction').textContent='PING TO ASK';
+ $('confidence').textContent='—';
+ $('probLeft').style.width='50%';
+ $('probRight').style.width='50%';
+ $('pathMode').textContent='No weak probe launched yet';
+ for(let i=0;i<COUNT;i++){
+  $('att'+i).style.width='0%';
+  $('attNum'+i).textContent='—';
+ }
+ for(const [a,b] of EDGES){
+  const edge=$('edge'+a+b);
+  edge.style.opacity=S.links?'.26':'.05';
+  edge.style.strokeWidth='2';
+ }
+}
 function update(){
  displayMatrix();
  if(S.lastQuery)renderAnswer(query(S,S.lastQuery.root,S.lastQuery.k));
- else {
-  const answer=query(S,S.selected,S.band);
-  renderAnswer(answer);
- }
+ else clearReadout();
  $('lessons').textContent=String(S.learned);
  $('modeTitle').textContent=S.method==='delta'?'Delta rule · corrective write':'Hebbian · additive write';
  $('probeMode').textContent=S.attention?'Content-sensitive attention':'Uniform reachable mixing';
  $('gating').textContent=S.links?'Links open':'Links disconnected';
  $('etaNumber').textContent=S.eta.toFixed(2);
 }
-function select(index){S.selected=index;$('source').value=String(index);update()}
+function select(index){S.selected=index;S.lastQuery=null;$('source').value=String(index);update()}
 function teachClick(){
  const targets=['LEFT','RIGHT'],bands=['LONG','MID','SHORT'];
  const list=teach(S,S.selected,S.band,S.value);
