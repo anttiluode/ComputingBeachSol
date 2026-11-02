@@ -75,8 +75,8 @@ function mockElement(){
     lineTo(){},stroke(){},fill(){},fillText(){},createLinearGradient(){
       return {addColorStop(){}};
     }
-  }};
- }
+  }}
+ };
 }
 function el(id){if(!elements.has(id))elements.set(id,mockElement());return elements.get(id)}
 for(const id of ['links','attention'])el(id).checked=true;
