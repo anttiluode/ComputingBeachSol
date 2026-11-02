@@ -1,5 +1,16 @@
 # ComputingBeachSol — a wave writes a medium, then a ping reads its history
 
+## November 2 — Beach AI: a matrix of four written wave memories
+
+**[Open the new Beach AI tab](https://anttiluode.github.io/ComputingBeachSol/beach-ai.html)** · [Model and acceptance contract](BEACH_AI_LAB.md) · [JavaScript core](beach-ai.js) · [regression tests](tests/beach-ai.test.cjs).
+
+The original physical observation ("small waves write fine print; larger waves write coarse print") is made into an **explicit associative fast-weight architecture**. Four connected beaches each have 36 fast wave cells and 36 persistent material cells. Three frequency addresses × two output values are encoded as six orthogonal Fourier gratings **in the material** itself. Strong teaching waves modify these gratings, while weak pings only decode them. Query reachability and content-dependent softmax attention permit distributed reading; an optional switch forwards attenuated teaching signals to neighbouring beaches, which is separate from plain read access. The choice between Hebbian additive updates and a delta-rule correction is interactive. A matched AB/BA control demonstrates additive commutation versus state-dependent order.
+
+This is a **software model built from the beach analogy**—not a new neural-network architecture or a physical laboratory demonstration. The fast 1D water recurrence propagates across linked beaches and its speed depends on material, but the memory output is decoded by Fourier projection of the bed rather than measuring a propagated water echo. Attention, routing weights, strong/weak distinction and teaching error all involve deliberately programmed operations. Frequencies are only three one-hot addresses, so two beaches with the same frequency and conflicting values can interfere instead of producing automatically disambiguated recollection. It neither proves natural wave-written AI nor benchmarks against DeltaNet/Titans.
+
+Use **Load four lessons → Weak wave READ**, switch **Link beaches** and **Attention**, then **Run AB versus BA control**. The source is static local HTML/JS: no server, LLM weights, cloud GPU, login, or external library is required. The main shore, Memory Drift, and Agent/Judge labs remain unchanged in their numerical solvers.
+
+
 ## G9: online resting costs and trial-and-revert agent (2 November 2026)
 
 **[Read G9 outcomes, including the negative material-moving rest result](SITE_G9_RESULTS.md)** · [8-seed rest CI](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41420776426).
