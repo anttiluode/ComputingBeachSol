@@ -1,5 +1,16 @@
 # ComputingBeachSol — a wave writes a medium, then a ping reads its history
 
+## Interactive GitHub Pages — the multiscale shore (November 2)
+
+**[Open the standalone HTML wave experiment](index.html)** · [Model guide, exact equations and controls](PAGES_LAB.md).
+
+The new browser page lets you write long (96-cell), medium (48-cell), and short (24-cell) spatial patterns into a single 288-cell material via a **real finite-difference wave update** and a slow thresholded, mass-conserving transport proxy. Its controls include selective resonant-mode versus incident boundary drive, weak frozen frequency readout versus a blank reference, and AB/BA–ABX/BAX order tests with strict fixed-operator/additive controls. The page is mobile-friendly, dependency-free, and does not require the Python experiments to run.
+
+This is an **additional 1D demonstration**, not a port of the 2D held-out G1/G2 numerical experiments. Its ideal mode-shaped excitation and wavelength-dependent stress averaging are explicit assumptions. The local bounded transport can itself create order effects independently of bed-to-wave feedback, and the page shows that confound rather than hiding it. Physical readback is measured from receiver waves, never inferred directly from the material spectrum.
+
+**To enable the site:** Settings → Pages → Deploy from a branch → `main` / `/(root)`. Once published, the expected address is `https://anttiluode.github.io/ComputingBeachSol/`.
+
+
 **G1: executable, source-pinned, held-out test passed in a deliberately simplified model.** A medium with a thresholded, mass-conserving slow wall changes how later waves propagate. Two exposures A and B have identical counts and nominal energy in either order; only the persistent material carries state between episodes.
 
 The challenge comes from [Evening](https://github.com/anttiluode/Evening) (positive scout-written order discrimination), [2729](https://github.com/anttiluode/2729) (negative held-out phase-pair order task), [WallMemoryLaw](https://github.com/anttiluode/WallMemoryLaw) (causal geometric limits on readable wall interactions), and [Arborverb](https://github.com/anttiluode/Arborverb) (verified adjoint for a *different*, scattering-waveguide model). Claude's independent sister branch: [ComputingBeachClaude](https://github.com/anttiluode/ComputingBeachClaude).
