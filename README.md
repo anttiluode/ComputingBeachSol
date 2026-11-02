@@ -1,5 +1,26 @@
 # ComputingBeachSol — a wave writes a medium, then a ping reads its history
 
+## G9: online resting costs and trial-and-revert agent (2 November 2026)
+
+**[Open the Agent/Judge lab](https://anttiluode.github.io/ComputingBeachSol/trial.html)** · [Source](trial.js) · [frozen G9 browser protocol](SITE_G9_PROTOCOL.md) · [8-seed GitHub Actions reproduction](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41420352959).
+
+Claude's [G8 independent results](https://github.com/anttiluode/ComputingBeachClaude) found that moving loss to an open rim **did not fix teacher-wave gradients**. At Q≈67, its keep/revert agent learned via objective evaluations, where passive teacher waves failed. This informed two site updates: (1) the original [Memory Drift lab](online.html) now keeps its **privileged teacher-free θ reset** but adds an **active teacher-free rest** arm in which the bed *also moves*, plus a teacher/rest scheduling gate; (2) the new [Agent/Judge lab](trial.html) uses 8 fixed fresh seeds, 2 tasks, 200 trials, and 5 proposal types to make a global judge and exact rollback explicit.
+
+**Site G9 reproducible numerical results** (48-site synthetic complex operator, loss=0.07, 200 trials, 8 seeds, median change of *receiver power*; not a replication of Claude's 2D floor):
+
+| Perturbation shape | Quiet harbour (negative is good) | Loud harbour (positive is good) |
+|---|---:|---:|
+| Smooth noise | −5.49 dB | **+8.43 dB** |
+| Wave-shaped storms | **−5.83 dB** | +7.30 dB |
+| White noise | −5.27 dB | +6.67 dB |
+| Conserved smooth | −5.49 dB | +7.96 dB |
+| Conserved storms | −4.48 dB | +4.89 dB |
+
+Every trial arm evaluates the changed wave operator and keeps only improvements; success is therefore **by design** given the external judge. The smooth-vs-storm result differs from Claude's numerical sand model. Conservation reduced storm performance but did not meaningfully hurt quieting with smooth changes. Shape and material constraints both matter. Each seed/shape/task uses 201 receiver solves; wave-shaped proposals also need 200 additional wave solves to generate their perturbations.
+
+The new active-rest writer uses extra forward-only waves and another material update per epoch; it does **not** have the same resource budget as the other writers. It is a falsification control addressing Claude's criticism, not a validated autonomous stress-homeostasis rule.
+
+
 
 ## Live browser experiment — memory drift over 20 exposures
 
