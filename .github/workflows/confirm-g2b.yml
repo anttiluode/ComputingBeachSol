@@ -1,0 +1,47 @@
+name: Reproduce G2b teacher-wave gate
+on:
+  push:
+    paths:
+      - '.github/workflows/confirm-g2b.yml'
+      - 'beach/teacher.py'
+      - 'beach/g2b.py'
+      - 'results/g2b_summary.json'
+  workflow_dispatch:
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Reproduce all 16 held-out seeds and five threshold settings
+        run: python -m beach.g2b --out results/g2b_full_reproduction.json
+      - name: Verify summary and preregistered verdict
+        run: |
+          python - <<'PY'
+          import json
+          saved=json.load(open('results/g2b_summary.json'))
+          observed=json.load(open('results/g2b_full_reproduction.json'))
+          assert observed['seed_range']==[800,815]
+          assert observed['writer_pass'] is False
+          assert observed['gates']==saved['gates']
+          for branch,label in [('on','teacher_on'),
+                               ('off','forward_only'),
+                               ('teacher_only','teacher_only'),
+                               ('interference','interference_only')]:
+              assert abs(observed['primary'][branch]['mean_alignment'] -
+                         saved['primary'][label]['mean_gradient_cosine']) < 1e-7
+          for item in saved['threshold_curve']:
+              key=str(float(item['threshold_fraction']))
+              row=observed['curve'][key]
+              assert abs(row['interference']['mean_alignment']-
+                         item['mean_interference_cosine'])<1e-7
+          print('G2b failure reproduced with frozen seeds and controls.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g2b-full-raw-seed-and-threshold-ledger
+          path: results/g2b_full_reproduction.json
