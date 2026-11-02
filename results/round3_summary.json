@@ -1,0 +1,163 @@
+{
+  "date": "2026-11-02",
+  "protocol": "PREREG_ROUND3.md",
+  "locked_training_seeds": "1100–1115",
+  "locked_heldout_seeds": "41000–41031",
+  "arrival_calibration": "unwritten flat wall, 0.1% of peak",
+  "arrival_steps": [
+    122,
+    122,
+    122
+  ],
+  "noise": "Gaussian, 4% of training early-window RMS",
+  "read_sources": [
+    0,
+    1,
+    2
+  ],
+  "windows_relative_to_arrival": {
+    "prearrival": [
+      -110,
+      -10
+    ],
+    "early": [
+      -10,
+      170
+    ],
+    "late": [
+      170,
+      350
+    ],
+    "whole": [
+      0,
+      510
+    ]
+  },
+  "accuracies": {
+    "K8": {
+      "AB": {
+        "prearrival": 0.5,
+        "early": 0.9375,
+        "late": 1,
+        "whole": 1
+      },
+      "ABX": {
+        "prearrival": 0.5,
+        "early": 0.953125,
+        "late": 1,
+        "whole": 1
+      },
+      "mean_transport_AB": 95.0696997924938,
+      "mean_transport_ABX": 109.59923776151878
+    },
+    "K16": {
+      "AB": {
+        "prearrival": 0.5,
+        "early": 1,
+        "late": 1,
+        "whole": 1
+      },
+      "ABX": {
+        "prearrival": 0.5,
+        "early": 1,
+        "late": 1,
+        "whole": 1
+      },
+      "mean_transport_AB": 391.1810932545085,
+      "mean_transport_ABX": 404.8003169808753
+    },
+    "K24": {
+      "AB": {
+        "prearrival": 0.5,
+        "early": 0.921875,
+        "late": 1,
+        "whole": 1
+      },
+      "ABX": {
+        "prearrival": 0.5,
+        "early": 0.828125,
+        "late": 1,
+        "whole": 1
+      },
+      "mean_transport_AB": 702.6882611196705,
+      "mean_transport_ABX": 717.33015080327
+    },
+    "K48": {
+      "AB": {
+        "prearrival": 0.5,
+        "early": 0.734375,
+        "late": 1,
+        "whole": 1
+      },
+      "ABX": {
+        "prearrival": 0.5,
+        "early": 0.765625,
+        "late": 0.953125,
+        "whole": 0.921875
+      },
+      "mean_transport_AB": 1274.7887022632913,
+      "mean_transport_ABX": 1311.2568598455043
+    }
+  },
+  "open_loop_fixed_operator_max_distance": {
+    "K8_AB": 2.0069243734993194e-15,
+    "K8_ABX": 2.054662609310059e-15,
+    "K48_AB": 2.804743167874151e-15,
+    "K48_ABX": 2.978596991761119e-15
+  },
+  "g2c": {
+    "seeds": "900–915",
+    "K": 8,
+    "teacher_rms_ratio": 0.02,
+    "step_norm": 0.025,
+    "threshold_relative_to_forward_energy_median": [
+      0,
+      0.25,
+      0.5,
+      0.75
+    ],
+    "zero_threshold": {
+      "projected_mean_cosine": 0.9999915162565091,
+      "projected_lower_loss": 16,
+      "projected_mean_loss_ratio": 0.8998705859337044,
+      "conservative_downhill_mean_cosine": -0.840987663529959,
+      "conservative_downhill_lower_loss": 0,
+      "conservative_downhill_mean_loss_ratio": 1.0885277797284671,
+      "forward_only_mean_cosine": 0.10432481601989281,
+      "forward_only_lower_loss": 11,
+      "forward_only_mean_loss_ratio": 0.8616654920926876,
+      "projected_better_than_forward_only_count": 8
+    },
+    "projected_mean_cosine_by_threshold": {
+      "0": 0.9999915162565091,
+      "0.25": 0.9999915162565092,
+      "0.5": 0.9960569435982859,
+      "0.75": 0.7841940439519536
+    },
+    "conservative_mean_cosine_by_threshold": {
+      "0": -0.840987663529959,
+      "0.25": -0.8409876635299585,
+      "0.5": -0.8308951924164895,
+      "0.75": -0.5791844649114926
+    }
+  },
+  "preregistered": {
+    "R1": true,
+    "R2": true,
+    "R3": true,
+    "R4": true,
+    "R5": true,
+    "E1": true,
+    "E2": true,
+    "E3": true,
+    "E4": true,
+    "E5": false
+  },
+  "limitations": [
+    "K changes physical patch width, stress averaging and transport activity along with parameter count; cannot isolate dimension.",
+    "Late readout outperforming early does not refute WallMemoryLaw causal onset/degree ceiling.",
+    "Energy contrast computes two-phase E_plus-E_minus externally, and material mean projection is global; no autonomous physical teacher sand writer.",
+    "Numerical adjoint used as ideal teacher, not a physically launched time-reversed field.",
+    "Signed velocity and conservative flux are deliberately synthetic patch-scale rules, not calibrated sediment."
+  ]
+}
