@@ -50,3 +50,36 @@ The two November numerical lines remain distinct:
 - [ComputingBeachClaude](https://github.com/anttiluode/ComputingBeachClaude): distributed shallow-water floor, difficult readable echo task, loss-limited physical teacher, and distinct transport tests.
 
 The next physically meaningful questions are whether unshaped incident waves form narrowband gratings robustly, whether multiple gratings can coexist without catastrophic rewriting, and whether a *genuinely local* conserved update can improve a transfer objective using only delayed success/failure (ObjektiYksi's keep/revert idea). **Nothing on this page demonstrates autonomous backpropagation or a neuron.**
+
+
+## November 2 extension — online memory drift lab (separate numeric instrument)
+
+The standalone [Memory Drift lab](online.html) runs beside the existing shore page, linked from the index navigation and the hero. It loads one local `online.js`, has no remote services or dependencies, and leaves the 288-cell shore experiment unchanged.
+
+### The model, not the metaphor
+
+**Different numerical engine.** The extension uses 48 coupled complex steady-state oscillators, with a tridiagonal wave operator `A(h,ω,γ)`. It solves `A u=F` at each material update using the Thomas tridiagonal solver. Source = node 3; receiver = node 44; the material enters the operator's real diagonal and changes propagation. The dissipation parameter appears as an imaginary diagonal term. This is a frequency-domain toy wave *operator*, not calibrated coastal hydraulics, not the original 288-cell time-stepping page, not Claude's 2D floor, and not the frozen Python Robin-wall G6–G8 benchmark. It has no sand-exchange physics, hydrodynamic overtopping, or calibrated scattering/radiation boundaries.
+
+Receiver loss is `J=0.5*|u_receiver-target|²`. Quiet targets zero complex receiver amplitude. Loud targets double the complex initial receiver amplitude, fixed across training. Each arm gets 20 online updates to the same initial rough material. A numerical teacher is produced by driving the receiver with the current complex error; its spatial field is `tau_i=beta*G_i,receiver*(u_receiver-target)`. That is an actual receiver-source wave-operator solve but is **not** generally the correct physical adjoint in dissipative media.
+
+The local eligibility signal is `r_i=|u_i+tau_i|²-theta_i`, where `theta` is the stored teacher-free baseline from the initial material. The **G8-style edge relay** runs 512 nearest-neighbor rounds to obtain conservative material increments. It neither stores an unbounded common potential nor explicitly calculates a global mean during the writer update. A fixed per-step *maximum change* is imposed externally to compare branches fairly; the material is **not** bounded by a physical sediment-capacity law.
+
+The seven controls, all evaluated on the current bed at every epoch, are:
+
+1. Frozen baseline `theta` (staleness).
+2. Teacher-tracking baseline with adjustable T, updated toward the combined forward+teacher energy at the new bed (teacher absorption).
+3. Teacher-free recalibration on the new bed, requiring **an extra independent forward solve every epoch**.
+4. Plain field-energy reinforcement with the same conservative relay (use-dependent baseline).
+5. Exact analytic loss gradient with global mean projection (**oracle, not local/physical**).
+6. Teacher off with frozen initial baseline.
+7. External two-phase subtraction of `|u+tau|²-|u-tau|²` (software reference).
+
+### What the site plots and stores
+
+The two graphs show relative receiver loss and cosine with the exact gradient over 20 episodes. The epoch slider shows the computed material profiles; the table gives initial gradient alignment, epoch-ten alignment and final task loss for all seven arms. Controls change the numerical run, not just a visualization. Export JSON includes all per-epoch material states and metrics.
+
+**Illustrative default, not a preregistered result:** seed 41, no damping, quiet objective, step 0.0005, teacher coefficient 0.003 and T=3. A Chromium and Node smoke check found a frozen-baseline final loss ratio of about **0.752**, compared with **0.596** after teacher-free recalibration, and **0.593** under exact analytic descent. The frozen baseline's gradient alignment decreases during repeated material modification. At seed 777, strong damping 0.07 and loud target, the first teacher gradient cosine is only about **0.12**, and its frozen-baseline final loss rises above the starting loss. These are **site examples** only; they cannot be compared directly to Claude's held-out 2D model or used to claim autonomous sediment learning.
+
+The site exposes a simple `window.__onlineBeachDiagnostics()` for browser smoke tests and its reproducible pure solver via `window.__onlineBeachModel.run(...)`. [`tests/test_online_page.py`](tests/test_online_page.py) checks syntax, controls, live behavior and conservative height updates with fixed illustrative settings. Node tests are skipped when Node is not installed.
+
+**Research interpretation:** the goal is to make Claude's concern inspectable: repeated updates can make a previously calibrated threshold stale, and aggressive teacher tracking can erase useful novelty. The page does not claim to identify a universal optimal memory timescale. The hard challenge still lies in physically generated, loss-aware teachers and a bounded, local and task-aligned material writer.
