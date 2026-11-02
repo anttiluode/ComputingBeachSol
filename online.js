@@ -23,7 +23,7 @@ function init(seed){let rand=rng(seed);return Array.from({length:N},(_,i)=>.013*
 function run(seed=41,task='quiet',loss=0,epochs=20,step=.0005,teacherBeta=.003,trackingT=3){
  let initial=init(seed),u0=field(initial,SOURCE,[1,0],loss),baseOutput=u0[RECEIVER];
  let target=task==='quiet'?[0,0]:cmul(baseOutput,2.0),out={};
- for(const kind of ['frozen','track3','recalib','natural','gd','off','twoPhase']){
+ for(const kind of ['frozen','track3','recalib','restPhysical','natural','gd','off','twoPhase']){
   let h=initial.slice(),theta=u0.map(energy),rows=[],firstCos=null;
   for(let e=0;e<=epochs;e++){
    let u=field(h,SOURCE,[1,0],loss),G=field(h,RECEIVER,[1,0],loss),
@@ -47,8 +47,22 @@ function run(seed=41,task='quiet',loss=0,epochs=20,step=.0005,teacherBeta=.003,t
     for(let i=0;i<N;i++)theta[i]+=(energy(add(up[i],tp[i]))-theta[i])/trackingT;
    }
    if(kind==='recalib'){
+    // Privileged reference: an extra measurement exactly replaces theta
+    // while the bed is frozen. This is NOT passive physical resting.
     let uFree=field(h,SOURCE,[1,0],loss);
     for(let i=0;i<N;i++)theta[i]=energy(uFree[i]);
+   }
+   if(kind==='restPhysical'){
+    // Distinct physically coupled rest: the teacher is switched OFF by an
+    // external gate. The forward-only rest can move the bed before theta
+    // adapts. The baseline does not magically reset without material cost.
+    let uFree=field(h,SOURCE,[1,0],loss);
+    let restDelta=relay(uFree.map((v,i)=>energy(v)-theta[i]),512);
+    let restMax=Math.max(...restDelta.map(Math.abs));
+    let restRate=restMax>1e-30?step/restMax:0;
+    for(let i=0;i<N;i++)h[i]+=restRate*restDelta[i];
+    let uAfter=field(h,SOURCE,[1,0],loss);
+    for(let i=0;i<N;i++)theta[i]+=(energy(uAfter[i])-theta[i])/Math.max(1,trackingT);
    }
   }
   out[kind]={rows,firstCos,ratio:rows.at(-1).J/rows[0].J,improve:(rows[0].J-rows.at(-1).J)/rows[0].J};
@@ -56,8 +70,8 @@ function run(seed=41,task='quiet',loss=0,epochs=20,step=.0005,teacherBeta=.003,t
  return {seed,task,loss,teacherBeta,trackingT,step,target,baseOutput,out};
 }
 const $=id=>document.getElementById(id);
-const colors={frozen:'#65e5d1',track3:'#ffcc79',recalib:'#a6a6ff',gd:'#9af0a6',natural:'#ef8da4',off:'#7a9ca5',twoPhase:'#d4bcf9'};
-const labels={frozen:'Frozen θ',track3:'Teacher-tracking θ',recalib:'Teacher-free recalibration',gd:'Exact gradient (oracle)',natural:'Plain field energy',off:'Teacher off',twoPhase:'External two-phase subtraction'};
+const colors={frozen:'#65e5d1',track3:'#ffcc79',recalib:'#a6a6ff',restPhysical:'#ffa9a0',gd:'#9af0a6',natural:'#ef8da4',off:'#7a9ca5',twoPhase:'#d4bcf9'};
+const labels={frozen:'Frozen θ',track3:'Teacher-tracking θ',recalib:'Privileged θ reset (bed frozen)',restPhysical:'Active rest (bed moves; T tracking)',gd:'Exact gradient (oracle)',natural:'Plain field energy',off:'Teacher off',twoPhase:'External two-phase subtraction'};
 let latest=null;
 function num(v,d=3){return Number.isFinite(v)?v.toFixed(d):'—'}
 function canvas(canvas){let rect=canvas.getBoundingClientRect(),width=Math.max(1,rect.width),height=Math.max(1,rect.height),dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.floor(width*dpr);canvas.height=Math.floor(height*dpr);let cx=canvas.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {ctx:cx,w:width,h:height}}
@@ -72,16 +86,16 @@ function graph(axis,rows,isCos){
  for(let j=0;j<=4;j++){let v=min+(max-min)*j/4,y=yy(v);ctx.strokeStyle='#42616c88';ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(R,y);ctx.stroke();ctx.fillStyle='#9cb6b6';ctx.fillText(num(v,isCos?1:2),2,y+3)}
  for(const t of [0,5,10,15,20]){let x=xx(t);ctx.fillStyle='#96b5ba';ctx.fillText(String(t),x-5,h-9)}
  const active=+$('epoch').value;ctx.setLineDash([4,5]);ctx.strokeStyle='#d8d8d8a0';ctx.beginPath();ctx.moveTo(xx(active),T);ctx.lineTo(xx(active),B);ctx.stroke();ctx.setLineDash([]);
- for(const d of dataset){ctx.beginPath();let initialized=false;for(let i=0;i<d.v.length;i++){let v=d.v[i];if(!Number.isFinite(v)){initialized=false;continue}let x=xx(i),y=yy(v);if(!initialized){ctx.moveTo(x,y);initialized=true}else ctx.lineTo(x,y)}ctx.strokeStyle=colors[d.k];ctx.lineWidth=d.k==='frozen'||d.k==='recalib'?2.7:1.3;ctx.globalAlpha=d.k==='twoPhase'?.55:1;ctx.stroke();ctx.globalAlpha=1;}
+ for(const d of dataset){ctx.beginPath();let initialized=false;for(let i=0;i<d.v.length;i++){let v=d.v[i];if(!Number.isFinite(v)){initialized=false;continue}let x=xx(i),y=yy(v);if(!initialized){ctx.moveTo(x,y);initialized=true}else ctx.lineTo(x,y)}ctx.strokeStyle=colors[d.k];ctx.lineWidth=d.k==='frozen'||d.k==='recalib'||d.k==='restPhysical'?2.7:1.3;ctx.globalAlpha=d.k==='twoPhase'?.55:1;ctx.stroke();ctx.globalAlpha=1;}
 }
 function bedplot(data){
  let {ctx,w,h}=canvas($('bed'));ctx.clearRect(0,0,w,h);const epoch=+$('epoch').value;
- let L=44,R=w-18,T=18,B=h-28,keys=['frozen','track3','recalib','gd'],max=1e-6;
+ let L=44,R=w-18,T=18,B=h-28,keys=['frozen','track3','recalib','restPhysical','gd'],max=1e-6;
  for(const key of keys)for(const x of data.out[key].rows[epoch].h)max=Math.max(max,Math.abs(x));
  max*=1.15;let xx=i=>L+(R-L)*i/(N-1),yy=v=>(T+B)/2-v/max*(B-T)/2;
  for(let i=0;i<5;i++){let y=T+(B-T)*i/4;ctx.strokeStyle='#4e677651';ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(R,y);ctx.stroke();}
  ctx.font='10px ui-monospace,monospace';ctx.fillStyle='#9dbdc1';ctx.fillText('+'+num(max,3),4,T+3);ctx.fillText('0',5,yy(0)+3);ctx.fillText('-'+num(max,3),4,B);ctx.fillText('west/source',L,B+17);ctx.fillText('harbour →',R-72,B+17);
- for(const key of keys){let arr=data.out[key].rows[epoch].h;ctx.beginPath();for(let i=0;i<N;i++){let x=xx(i),y=yy(arr[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.strokeStyle=colors[key];ctx.lineWidth=key==='frozen'||key==='recalib'?2.2:1.2;ctx.stroke()}
+ for(const key of keys){let arr=data.out[key].rows[epoch].h;ctx.beginPath();for(let i=0;i<N;i++){let x=xx(i),y=yy(arr[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.strokeStyle=colors[key];ctx.lineWidth=key==='frozen'||key==='recalib'||key==='restPhysical'?2.2:1.2;ctx.stroke()}
  let f=data.out.frozen.rows[epoch],c=data.out.recalib.rows[epoch];
  $('inspect').textContent=`Epoch ${epoch}: frozen-baseline receiver loss ${num(f.J/data.out.frozen.rows[0].J)}, teacher-free recalibration ${num(c.J/data.out.recalib.rows[0].J)}. All curves show actual material heights, not simulated sand photos.`;
 }
@@ -91,7 +105,7 @@ function resetStatus(){
  const frozen=latest.out.frozen,recalib=latest.out.recalib;
  $('best').textContent=num(recalib.ratio,3);$('frozen').textContent=num(frozen.ratio,3);$('alignment').textContent=num(frozen.rows[10].cos,3);
  let note=latest.loss>=.07?' Strong damping: the injected teacher is not the true adjoint.':' Watch when frozen θ loses alignment; this is not proof of naturally self-training sediment.';
- $('status').textContent=`Numerical solver finished · 20 epochs · K=48 · 7 matched controls.${note}`;
+ $('status').textContent=`Numerical solver finished · 20 epochs · K=48 · 8 different writer branches.${note}`;
 }
 async function execute(){
  let runButton=$('run');runButton.disabled=true;$('export').disabled=true;$('status').textContent='Solving a new wave operator at every material update…';
@@ -102,7 +116,7 @@ async function execute(){
 }
 function exportData(){
  if(!latest)return;
- const notes={model:'48-node, steady-state complex tridiagonal wave operator',teacher:'receiver-launched reciprocal numerical field, not verified physical adjoint at loss',projection:'G8 neighbour-edge relay, 512 rounds per writer update; externally norm-matched steps',limitations:'Synthetic diagnostic, not the preregistered Python or Claude numerical benchmark; no real sand.'};
+ const notes={model:'48-node, steady-state complex tridiagonal wave operator',teacher:'receiver-launched reciprocal numerical field, not verified physical adjoint at loss',projection:'G8 neighbour-edge relay, 512 rounds per writer update; externally norm-matched steps; restPhysical has extra forward measurements and a second bed update per epoch',limitations:'Synthetic diagnostic, not the preregistered Python or Claude numerical benchmark; no real sand.'};
  const blob=new Blob([JSON.stringify({...latest,notes},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='beach-online-memory.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
