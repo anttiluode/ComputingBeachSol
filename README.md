@@ -6,6 +6,15 @@ The challenge comes from [Evening](https://github.com/anttiluode/Evening) (posit
 
 **Important:** The beach is presently a **patch-scale numerical analog**, not a hydrodynamic beach. The effective transport is **not** a calibrated Exner/Shields sand law. Nothing here demonstrates actual sediment backpropagation or a new physical effect.
 
+## Status: G1 passes, G2a passes, G2b **fails** in the tested signed-transport model
+
+- **G1 (history)**: 62/64 fresh noisy receiver echoes decode AB versus BA; frozen-operator control 50%.
+- **G2a (sensitivity)**: exact discrete Robin-wall gradient agrees with finite differences.
+- **G2b (teacher wave)**: a phase-aligned, externally amplified numerical adjoint teacher does **not** give reliable gradient-directed sediment motion. The isolated interference-induced change has mean cosine **−0.241** with the projected descent gradient across 16 held-out cases; teacher-on beats forward-only in only **5/16**.
+- **G3 (fast nonlinear waves)**: not yet tested.
+
+[Read the G2b negative-result report](G2B_RESULTS.md) · [Frozen protocol](PREREG_G2B.md) · [All metrics, seed table](results/g2b_summary.json). The raw full 16 × 5 sweep can be regenerated with `python -m beach.g2b` and is uploaded by [the G2b replay workflow](.github/workflows/confirm-g2b.yml). None of this is real sediment or a physical in-situ backpropagation demonstration.
+
 ## Result — G1, frozen before held-out evaluation
 
 [Pre-registered experiment](PREREG.md) was committed in `586ed5b5` before seeds 40000–40031 were evaluated. Development tuning used other seeds. The configuration, locked train/test split, results and provenance are in [results/g1_confirmatory.json](results/g1_confirmatory.json).
@@ -54,6 +63,7 @@ cd ComputingBeachSol
 python3.13 -m pip install -r requirements.txt
 python3.13 -m unittest discover -s tests -v
 python3.13 -m beach.experiment --out results/reproduction.json
+python3.13 -m beach.g2b --out results/g2b_reproduction.json
 ```
 
 On other systems, replace `python3.13` with your Python executable. Only NumPy is required. There are no GPU requirements, model downloads or API keys.
@@ -71,9 +81,9 @@ dJ/db_i = -(C*DT)^2 * KAPPA / (1 + DAMP*DT/2)
 
 For the 8-patch, 190-step finite-difference check, relative L2 error is **2.10e-8**, gradient-direction cosine **0.99999999998**, and the local forward/adjoint cross-product algebra matches to ~2e-16 relative error. Source: [G2a ledger](results/g2a_adjoint.json). Unit tests independently check all three sources and upstream forward parity. Run: `python -m beach.adjoint`.
 
-**G2b remains open: teacher-wave-induced *material writing*.** The numerical adjoint is a measurement benchmark, not itself a teacher field traveling through a physical beach. An actual time-reversed/reciprocal wave source must be realized with proper damping and port boundary conditions. Then measure whether *the thresholded signed flux's change* aligns with `-dJ/db` under a forcing sweep, including null and component controls. The interference cross term by itself does not establish a physically implemented learning rule.
+**G2b — tested, negative for the existing writer.** In 16 held-out tasks the G1 signed-velocity transport fails the preregistered teacher-wave criterion. The teacher's *mathematical* local cross term computes the correct gradient, but the thresholded signed flux and its divergence do not preserve that direction. [See full result and caveats](G2B_RESULTS.md). This test used the **numerically calculated adjoint field** as an ideal exposure; it did **not** demonstrate a physically injected time-reversed teacher. A more faithful energy-sensitive Exner/shallow-water model and physical backward excitation are independent open problems.
 
-**G3 — fast wave-time gating.** A frozen linear wave equation is a state-bearing but linear read operator. To get a fast computer, add a physically motivated overtopping or local nonlinear gate and compare with ordinary linear and matched conventional nonlinear baselines. G2a's **discrete sensitivity check** is implemented; G2b's physical writer and G3's fast nonlinear gate are not.
+**G3 — fast wave-time gating.** A frozen linear wave equation is a state-bearing but linear read operator. To get a fast computer, add a physically motivated overtopping or local nonlinear gate and compare with ordinary linear and matched conventional nonlinear baselines. G2a and the **negative G2b numerical teacher-field test** are implemented; a physically injected teacher wave and G3's fast nonlinear gate are not.
 
 **Critical caveats:** the threshold, rate and source choice were designed on development worlds; one geometry, one deterministic toy fluid, 32 paired confirmatory seeds, and a simple centroid reader do not establish broad generality. Repetition on different geometries and stress laws is required. Never confuse finite-difference memory of the material with proof of a novel physical backpropagation mechanism.
 
