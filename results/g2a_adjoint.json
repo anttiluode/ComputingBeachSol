@@ -1,0 +1,33 @@
+{
+  "stage": "G2a - mathematical referee only, no teacher-wave writing yet",
+  "model": "WallMemoryLaw frozen 96x96 Robin-wave recurrence",
+  "seed": 99,
+  "source": 0,
+  "steps": 190,
+  "eps": 0.0002,
+  "loss": 2.4842313057724026e-11,
+  "analytic_gradient": [
+    -4.345461686430197e-11,
+    -6.958991797834957e-12,
+    -7.328770566307039e-12,
+    -4.057866506312181e-11,
+    -1.3273989253965968e-10,
+    -5.231686020965165e-11,
+    -5.301557871409061e-11,
+    -1.3372198079580315e-10
+  ],
+  "finite_difference_gradient": [
+    -4.3454614932685694e-11,
+    -6.9589933787447686e-12,
+    -7.328771004698486e-12,
+    -4.0578665866553856e-11,
+    -1.3273989506162878e-10,
+    -5.231686117416209e-11,
+    -5.301557916076935e-11,
+    -1.3372198304872695e-10
+  ],
+  "relative_l2_error": 2.096121705689838e-8,
+  "direction_cosine": 0.9999999999776217,
+  "cross_identity_relative_error": 2.0860355172661717e-16,
+  "caveat": "This checks a discrete analytic adjoint against 8 central finite differences. Cross product equivalence is algebraic; no physical sediment update, time reversal, or teacher-wave parameter learning was tested."
+}
