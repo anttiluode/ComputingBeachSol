@@ -1,0 +1,48 @@
+{
+  "protocol": "PREREG_G2D.md",
+  "prereg_commit": "00cf3ff3ca4357070771b005f7ad56dedeeb513e",
+  "date": "2026-11-02",
+  "heldout_seeds": "1200–1215",
+  "K": 8,
+  "teacher_rms_ratio": 0.02,
+  "threshold_fraction": 0,
+  "normalized_material_update_length": 0.025,
+  "projected_energy_contrast": {
+    "mean_gradient_cosine": 0.9999860253318875,
+    "median_gradient_cosine": 0.9999991626279834,
+    "lower_loss_count": 16,
+    "mean_loss_ratio": 0.8876890484681155
+  },
+  "matched_mean_projected_natural_erosion": {
+    "mean_gradient_cosine": 0.5059641069648646,
+    "lower_loss_count": 14,
+    "mean_loss_ratio": 0.9438376546040987
+  },
+  "matched_mean_projected_single_exposure": {
+    "mean_gradient_cosine": 0.49261132565771504,
+    "lower_loss_count": 14,
+    "mean_loss_ratio": 0.9458269527063186
+  },
+  "local_conservative_downhill_flux": {
+    "mean_gradient_cosine": -0.8561776166315492,
+    "lower_loss_count": 0,
+    "mean_loss_ratio": 1.1008057535909799
+  },
+  "paired_wins": {
+    "vs_conserved_natural": 16,
+    "vs_conserved_single_exposure": 16
+  },
+  "gates": {
+    "D1": true,
+    "D2": true,
+    "D3": true,
+    "D4": true
+  },
+  "limitations": [
+    "Mean projection is a globally computed constraint, not a local Exner flux; all comparator arms receive the same external projection.",
+    "Contrast is externally computed from two separate measured energy exposures E+ and E-.",
+    "Teacher is the numerically computed exact adjoint field, externally normalized, not a physical receiver-injected wave.",
+    "Only one toy 8-patch geometry; no real sediment, no autonomous physical backpropagation.",
+    "Separate from the original G2c E5 failure; no rewriting preregistered verdicts."
+  ]
+}
