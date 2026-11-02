@@ -1,0 +1,47 @@
+name: G8 edge-only bounded relay confirmatory
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/confirm-g8.yml'
+      - 'PREREG_G8.md'
+      - 'beach/g8_edge.py'
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Execute G8 held-out K8 K48 cap and leak sweep
+        run: OPENBLAS_NUM_THREADS=1 python -m beach.g8_edge --phase confirm --out results/g8_confirm.json
+      - name: Check numerical protocol and report pass/fail gates unchanged
+        run: |
+          python - <<'PY'
+          import json,math
+          r=json.load(open('results/g8_confirm.json'))
+          assert r['protocol']=='PREREG_G8.md'
+          assert r['seeds']==list(range(2200,2208))
+          assert r['resolutions']==[8,48]
+          assert r['rounds']=={'8':64,'48':4096}
+          assert r['caps']==[.5,2.,16.,64.]
+          assert r['leaks']==[.001,.01]
+          assert len(r['per_case'])==16
+          assert r['clip_capacity_is_externally_calibrated'] is True
+          assert r['teacher_is_externally_computed'] is True
+          assert r['writer_uses_global_mean'] is False
+          assert set(r['summary']['gates'])=={
+              'G8_A_edge_equivalence_and_mass',
+              'G8_B_no_runaway_gauge',
+              'G8_C_loose_finite_cap'}
+          assert all(math.isfinite(row['edge_score']['loss_ratio']) for row in r['per_case'])
+          print('Held-out G8 outcomes (hypothesis failures are allowed):',r['summary']['gates'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g8-frozen-heldout
+          path: results/g8_confirm.json
