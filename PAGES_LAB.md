@@ -83,3 +83,17 @@ The two graphs show relative receiver loss and cosine with the exact gradient ov
 The site exposes a simple `window.__onlineBeachDiagnostics()` for browser smoke tests and its reproducible pure solver via `window.__onlineBeachModel.run(...)`. [`tests/test_online_page.py`](tests/test_online_page.py) checks syntax, controls, live behavior and conservative height updates with fixed illustrative settings. Node tests are skipped when Node is not installed.
 
 **Research interpretation:** the goal is to make Claude's concern inspectable: repeated updates can make a previously calibrated threshold stale, and aggressive teacher tracking can erase useful novelty. The page does not claim to identify a universal optimal memory timescale. The hard challenge still lies in physically generated, loss-aware teachers and a bounded, local and task-aligned material writer.
+
+
+## November 2 G9 extension — active rest and an agent's judge
+
+[Full G9 numerical outcomes and negative results](SITE_G9_RESULTS.md) · [premeasurement protocol](SITE_G9_PROTOCOL.md).
+
+The [Memory Drift lab](online.html) now includes **eight** writer branches: the original privileged teacher-free `theta` reset, which freezes material during recalibration, and a new **material-moving rest**. In the new arm a teacher-free forward exposure generates another G8 conservative edge-relay material update before the stress baseline relaxes toward the current material at T. It requires an externally scheduled teacher/rest switch, two extra wave solves per epoch, and potentially another maximum-amplitude material change. This intentionally does **not** have an identical physical exposure budget to the teacher-only arms.
+
+The browser also has an **eight fixed seed × quiet/loud × 20 epoch** audit, which reports median receiver-power dB and median complex-target receiver loss separately. In the strong-loss case (loss=0.07, T=3), material-moving rest makes quiet power worse by median **+0.689 dB** and loud power worse by **−0.636 dB**, improving only **1/8** examples for each objective. The old privileged reset still yields small improvements in all eight. The cross-task, fixed-seed reference run is independently replayed in [CI](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41420776426). These are toy results, not clinical/physical measurements.
+
+The new [Agent / Judge the Shore lab](trial.html) instead tests material trial-and-revert under a **global external objective observer**. Eight fixed seeds, 200 candidate edits per seed per shape, quiet/loud receiver-power objectives, strong loss=0.07, and five shapes (white, smooth, wave-shaped storms, and conserving smooth/storm alternatives). It displays median power dB histories, acceptances, and exact receiver/proposal wave solve counts. Its independent [CI reproduction](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41420352959) gives **−5.83 dB** quieting for wave-shaped storms and **+8.43 dB** amplification for smooth random edits as median best results across proposal families. Different from Claude's 2D test and *not* autonomous sediment learning.
+
+Both pages use the same **48-node synthetic tridiagonal complex operator** rather than the 288-cell shore solver. A receiver objective, exact rollback, teacher/rest gating, global conservation imposed on some candidate shapes, and external update normalization are computational privileges that must be paid for. The G9 site does not support a claim that passive sand has learned an arbitrary task.
+
