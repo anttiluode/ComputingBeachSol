@@ -1,0 +1,85 @@
+name: Reproduce round3 held-out beach tests
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/confirm-round3.yml'
+      - 'beach/resolution.py'
+      - 'beach/g1b_batch.py'
+      - 'beach/energy_writer.py'
+      - 'results/round3_summary.json'
+jobs:
+  g2c-energy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Reproduce 16 held-out gradient-matched writer cases
+        run: python -m beach.energy_writer --phase confirm --out results/g2c_reproduced.json
+      - name: Check preregistered success and negative control
+        run: |
+          python - <<'PY'
+          import json
+          a=json.load(open('results/round3_summary.json'))['g2c']['zero_threshold']
+          r=json.load(open('results/g2c_reproduced.json'))['results']['0']
+          s=r['summary']
+          assert abs(s['projected']['mean_cosine']-a['projected_mean_cosine'])<1e-8
+          assert s['projected']['lower_loss']==16
+          assert abs(s['conservative_downhill']['mean_cosine']-a['conservative_downhill_mean_cosine'])<1e-8
+          assert s['conservative_downhill']['lower_loss']==0
+          beats=sum(x['projected']['ratio']<x['forward_only']['ratio'] for x in r['per_seed'])
+          assert beats==8
+          print('G2c passes alignment but fails advantage over natural erosion', beats)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: round3-energy-heldout-raw
+          path: results/g2c_reproduced.json
+
+  g1b-resolution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Rebuild frozen AB BA ABX BAX materials and wave echoes
+        shell: bash
+        run: |
+          for k in 8 16 24 48; do
+            for hist in AB ABX; do
+              for off in 0 8; do
+                OPENBLAS_NUM_THREADS=1 python -m beach.g1b_batch --k "$k" --hist "$hist" --split train --offset "$off" --count 8
+              done
+              for off in 0 8 16 24; do
+                OPENBLAS_NUM_THREADS=1 python -m beach.g1b_batch --k "$k" --hist "$hist" --split test --offset "$off" --count 8
+              done
+            done
+          done
+      - name: Aggregate blinded receiver echo accuracy
+        run: OPENBLAS_NUM_THREADS=1 python -m beach.g1b_batch --gather --out results/g1b_reproduced.json
+      - name: Match all locked headline accuracies
+        run: |
+          python - <<'PY'
+          import json
+          saved=json.load(open('results/round3_summary.json'))['accuracies']
+          new=json.load(open('results/g1b_reproduced.json'))['histories']
+          for k in ('8','16','24','48'):
+              for hist in ('AB','ABX'):
+                  for window in ('prearrival','early','late','whole'):
+                      got=new[k]['histories'][hist]['window_scores'][window]['accuracy']
+                      ref=saved['K'+k][hist][window]
+                      print(k,hist,window,got,ref)
+                      assert abs(got-ref)<1e-12
+          print('All K/window/history accuracy checks reproduced')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: round3-resolution-heldout-raw
+          path: results/g1b_reproduced.json
