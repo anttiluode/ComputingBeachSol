@@ -1,0 +1,36 @@
+name: Reproduce G1 held-out gate
+on:
+  push:
+    paths:
+      - '.github/workflows/confirm-g1.yml'
+      - 'beach/**'
+      - 'wml/**'
+      - 'results/g1_confirmatory.json'
+  workflow_dispatch:
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Rerun 32 frozen held-out pairs from repository code
+        run: python -m beach.experiment --out results/ci_reproduction.json
+      - name: Check exact condition counts
+        run: |
+          python - <<'PY'
+          import json
+          expected=json.load(open('results/g1_confirmatory.json'))['modes']
+          observed=json.load(open('results/ci_reproduction.json'))['modes']
+          for mode in ('live','fixed','permuted'):
+              for key in ('correct_ab','correct_ba','balanced_accuracy','paired_label_swap_p'):
+                  print(mode,key,observed[mode][key],expected[mode][key])
+                  assert abs(observed[mode][key]-expected[mode][key])<1e-12
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: computing-beach-g1-reproduction
+          path: results/ci_reproduction.json
