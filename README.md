@@ -1,5 +1,16 @@
 # ComputingBeachSol — a wave writes a medium, then a ping reads its history
 
+## November 2: G6 and G7 — stress memory and local redistribution
+
+**New, reproducible numerical result:** [G6 frozen test](G6_RESULTS.md) | [G7 frozen test](G7_RESULTS.md) | [G6 protocol](PREREG_G6.md) | [G7 protocol](PREREG_G7.md).
+
+- **G6: 5 of 6 gates passed.** A second slow patch-stress state learned from twelve ordinary exposures makes one idealized teacher-on exposure produce an update aligned with the desired task gradient (mean cosine **0.9971**, **16/16** improved); flipping teacher phase reverses it. The direct nearest-neighbour conservative flux **fails** (**0/16**). The successful G6 step still uses global mean projection and a numerically generated ideal teacher.
+- **G7: 5 of 5 gates passed.** A separate local diffusion potential replaces the global projection with strictly neighbour-only communications and conservative pair flux. At K8 it reaches mean relative projection error **0.000234** after 64 local rounds; at K48 it takes **4096 rounds** to reach **4.19e−7**. Receiver loss improves in **8/8** held-out cases at each size. **However, the potential's common mode grows without bound:** physical leak/saturation and real local sensing remain untested.
+- Frozen runs in GitHub Actions: [G6](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41414618551) and [G7](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41415181563), each with complete per-seed machine-readable artifacts.
+
+Try `python3.13 -m beach.g6_memory --phase development` and `python3.13 -m beach.g7_local --phase development`. Confirmatory phases reproduce the preregistered test seeds. None of this is literal hydraulic sand, an autonomous physical teacher, or a demonstration of homeostatic learning in living axons.
+
+
 ## Interactive GitHub Pages — the multiscale shore (November 2)
 
 **[Open the standalone HTML wave experiment](index.html)** · [Model guide, exact equations and controls](PAGES_LAB.md).
