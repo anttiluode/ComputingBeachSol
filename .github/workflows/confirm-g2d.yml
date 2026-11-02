@@ -1,0 +1,44 @@
+name: Reproduce G2d equal-mass baseline
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/confirm-g2d.yml'
+      - 'beach/energy_writer.py'
+      - 'beach/g2d.py'
+      - 'results/g2d_summary.json'
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Run 16 frozen G2d fair-conservation tests
+        run: OPENBLAS_NUM_THREADS=1 python -m beach.g2d --out results/g2d_reproduced.json
+      - name: Check original held-out verdict and aggregate scores
+        run: |
+          python - <<'PY'
+          import json
+          new=json.load(open('results/g2d_reproduced.json'))
+          saved=json.load(open('results/g2d_summary.json'))
+          assert new['seeds']==list(range(1200,1216))
+          assert all(new['gates'].values())
+          assert new['projected_beats_forward_conserved']==saved['paired_wins']['vs_conserved_natural']==16
+          assert new['projected_beats_single_conserved']==saved['paired_wins']['vs_conserved_single_exposure']==16
+          for name,ref in [('projected','projected_energy_contrast'),
+                           ('forward_only_conserved','matched_mean_projected_natural_erosion'),
+                           ('single_plus_conserved','matched_mean_projected_single_exposure'),
+                           ('conservative_downhill','local_conservative_downhill_flux')]:
+              actual=new['summary'][name]
+              assert abs(actual['mean_cosine']-saved[ref]['mean_gradient_cosine'])<1e-8
+              assert actual['lower_loss']==saved[ref]['lower_loss_count']
+          print('G2d fair conservation benchmark independently reproduced')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g2d-raw-heldout
+          path: results/g2d_reproduced.json
