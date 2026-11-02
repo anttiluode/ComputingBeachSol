@@ -1,0 +1,49 @@
+name: G9 browser agent frozen 8-seed benchmark
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'trial.js'
+      - 'SITE_G9_PROTOCOL.md'
+      - '.github/workflows/site-g9.yml'
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fixed eight-seed quiet and loud trial benchmark
+        run: |
+          mkdir -p results
+          node - <<'NODE'
+          const fs=require('fs'),a=require('./trial.js');
+          const result=a.runSweep(.07,200,.0025);
+          fs.writeFileSync('results/g9_site_confirm.json',JSON.stringify(result,null,2)+'\n');
+          for(const task of ['quiet','loud']){
+            console.log('G9',task,JSON.stringify(Object.fromEntries(
+              a.SHAPES.map(kind=>[kind,{
+                medianDb:result.groups[task][kind].medianDb,
+                accepted:result.groups[task][kind].meanAccepted,
+                receiverReads:result.groups[task][kind].receiverReads,
+                proposalSolves:result.groups[task][kind].proposalSolves
+              }])
+            )));
+          }
+          if(result.seeds.join(',')!=='1001,1009,1013,1019,1021,1031,1033,1039')throw Error('seed mismatch');
+          if(result.perSeed.length!==80)throw Error('80 seed/task/shape pairs required');
+          for(const r of result.perSeed){
+            if(r.receiverReads!==201||r.maxAcceptedObjectiveWorsening>1e-12)
+              throw Error('trial integrity');
+            if(r.kind.endsWith('Conserved')&&Math.abs(r.signedMaterialChange)>1e-9)
+              throw Error('conservation');
+            if(r.task==='quiet'&&r.endPower>r.startPower+1e-12)
+              throw Error('quiet deterioration');
+            if(r.task==='loud'&&r.endPower<r.startPower-1e-12)
+              throw Error('loud deterioration');
+          }
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g9-8seed-200trial-agent
+          path: results/g9_site_confirm.json
