@@ -112,7 +112,8 @@ class Beach:
             hist.append(metrics)
         return h, hist
 
-    def read(self, h, source=0, steps=None, drive=1.0):
+    def read(self, h, source=0, steps=None, drive=None):
         steps = self.cfg.read_steps if steps is None else steps
+        drive = self.cfg.read_drive if drive is None else float(drive)
         # A frozen read calls WML's original exact implementation, not ours.
         return self.cav.run(self.kappa_bits(h), source=source, steps=steps)[0, :, 0] * drive
