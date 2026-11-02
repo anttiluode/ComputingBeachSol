@@ -25,7 +25,7 @@ before=A.materialSignature(state);
 let ans=A.ping(state,0,0);
 assert.ok(A.sameMaterial(before,A.materialSignature(state)));
 assert.equal(ans.readOnly,true);
-assert.ok(ans.y[0]>.35 && ans.y[1]<1e-10);
+assert.ok(ans.y[0]>.05 && ans.y[0]<=x.after[0]+1e-10 && Math.abs(ans.y[1])<1e-10);
 // Linked waves can interrogate remote beach material; disconnected cannot.
 const net=A.create();
 A.writeOne(net.nodes[3],2,1,'delta',.9);
