@@ -60,6 +60,46 @@ const sand=A.materialSignature(physical);
 for(let t=0;t<350;t++)A.frame(physical);
 assert.ok(A.sameMaterial(sand,A.materialSignature(physical)));
 for(const n of physical.nodes)for(const f of n.u)assert.ok(Number.isFinite(f));
+
+// Browser runtime smoke test: real event handlers + canvas draw with a mocked DOM.
+const vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
+const elements=new Map();
+function mockElement(){
+ const listeners={},children=[];
+ return {listeners,children,style:{},textContent:'',value:'0',checked:false,
+  append(...xs){children.push(...xs)},setAttribute(){},
+  addEventListener(type,cb){listeners[type]=cb},
+  getBoundingClientRect(){return {width:260,height:140}},
+  getContext(){return {
+    setTransform(){},clearRect(){},fillRect(){},beginPath(){},moveTo(){},
+    lineTo(){},stroke(){},fill(){},fillText(){},createLinearGradient(){
+      return {addColorStop(){}};
+    }
+  }};
+ }
+}
+function el(id){if(!elements.has(id))elements.set(id,mockElement());return elements.get(id)}
+for(const id of ['links','attention'])el(id).checked=true;
+el('eta').value='.36';el('method').value='delta';
+const dom={getElementById:el,createElement:mockElement};
+const win={devicePixelRatio:1,addEventListener(){}};
+const context={document:dom,window:win,requestAnimationFrame(){},
+  console,Float64Array,Array,Math,Number};
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(path.join(__dirname,'../beach-ai.js'),'utf8'),context);
+assert.ok(win.__beachAiDiagnostics,'browser diagnostic missing');
+assert.equal(el('prediction').textContent,'PING TO ASK');
+el('teach').listeners.click();
+assert.equal(el('prediction').textContent,'PING TO ASK');
+const materialBefore=win.__beachAiDiagnostics().material;
+el('ping').listeners.click();
+assert.equal(el('prediction').textContent,'LEFT');
+assert.ok(A.sameMaterial(materialBefore,win.__beachAiDiagnostics().material));
+el('demo').listeners.click();
+assert.equal(win.__beachAiDiagnostics().lessons,4);
+el('control').listeners.click();
+assert.ok(el('controlResult').textContent.includes('Delta'));
+
 console.log('BEACH_AI_TEST_PASS',JSON.stringify({
  basis:axes.length,localWrite:x.after,abba:order,
  remoteLinked:linked.y,remoteDisconnected:isolated.y,
