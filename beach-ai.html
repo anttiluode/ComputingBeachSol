@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07141c"><meta name="description" content="Four connected writable beaches as a working associative fast-weight memory with attention, strong writes and weak probes.">
+<title>Beach AI · Four writable wave memories / Computing Beach Sol</title>
+<style>
+:root{color-scheme:dark;--bg:#07141c;--panel:#0e2832;--line:#2f5058;--cream:#edf7f2;--muted:#a3c0c0;--aqua:#6be8d9;--gold:#f6c077;--pink:#f59cb1;--violet:#c6a1ed}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--cream);background:radial-gradient(ellipse at 86% 0,#1d4045,transparent 45%),#07141c;font:14px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(#cbe9d506 1px,transparent 1px),linear-gradient(90deg,#cbe9d506 1px,transparent 1px);background-size:36px 36px}
+a{color:var(--aqua);text-decoration:none}a:hover{text-decoration:underline}
+main{max-width:1390px;margin:auto;padding:18px 24px 75px}
+nav{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12px;font-weight:780;text-transform:uppercase;letter-spacing:.08em;padding:8px 0 28px}
+nav strong{color:var(--gold)}nav .tabs{display:flex;gap:9px;flex-wrap:wrap}
+nav .tabs a{color:#c0d9d4;border:1px solid #35535a;border-radius:8px;padding:8px 10px}nav .tabs a[aria-current="page"]{background:#225952;color:#f3fffb;border-color:#70dbcc}
+.eyebrow{color:var(--aqua);text-transform:uppercase;font-size:11px;font-weight:800;letter-spacing:.18em}
+h1{font-size:clamp(42px,6vw,78px);line-height:1.02;letter-spacing:-.075em;margin:13px 0 16px}h1 em{font-style:normal;color:var(--gold)}
+.hero{display:grid;grid-template-columns:1.6fr 1fr;align-items:center;gap:30px;margin-bottom:20px}
+.lead{font-size:17px;color:#d1e5df;max-width:720px}
+.aside{border-left:2px solid #e4b66c;background:#20352f66;padding:18px 22px;font-size:13px;color:#d6e6da}
+.aside strong{color:var(--gold)}.aside p{margin:8px 0 0}
+.section{margin-top:22px}.section-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h2{font-size:19px;letter-spacing:-.03em;margin:0 0 12px}h3{font-size:15px;margin:0 0 9px}
+.panel{border:1px solid var(--line);background:linear-gradient(160deg,#102e38,#091d27);border-radius:16px;padding:19px}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(340px,.78fr);gap:18px}
+.grid-wrap{position:relative;padding:6px 8px}.beach-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 26px;position:relative;z-index:1}
+.links-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.links-svg line{stroke:#6be8d9;stroke-width:3;opacity:.4;transition:stroke-width .2s,opacity .2s}
+.beach{display:block;text-align:left;appearance:none;border:1px solid #3b626a;cursor:pointer;color:var(--cream);border-radius:13px;background:#102b35;padding:12px;width:100%;min-width:0}
+.beach:hover{border-color:#7bdaca;background:#123640}.beach[aria-pressed="true"]{border-color:#f6c077;box-shadow:0 0 0 2px #e8c07620,0 0 30px #f6c07716}
+.beach-head{display:flex;justify-content:space-between;align-items:center;gap:5px;font-size:13px;font-weight:820;margin-bottom:7px}
+.beach-head small{font-size:10px;font-weight:600;color:#a9c1c2}
+.beach canvas{width:100%;height:141px;display:block;border-radius:7px}
+.matrix-line{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:5px;align-items:center;font-size:10px}
+.matrix-line>span:first-child{color:#a9c9c5;letter-spacing:.05em}
+.matrix-cell{font:11px/1.3 ui-monospace,Consolas,monospace;text-align:center;padding:5px 1px;border-radius:5px;border:1px solid #37525a}
+.matrix-note{display:flex;gap:8px;justify-content:flex-end;color:#8aaeb0;font-size:10px;font-variant-numeric:tabular-nums;margin-top:7px}
+.stack{display:grid;gap:17px}.pill{color:var(--aqua);font-size:10px;border:1px solid #376b6b;border-radius:100px;padding:4px 9px;letter-spacing:.08em;font-weight:850}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#abcac9;font-weight:700;display:block}
+select,input[type=range]{width:100%;margin:7px 0 0}
+select{padding:10px 9px;background:#173943;border:1px solid #3d646c;border-radius:8px;color:var(--cream);font:inherit}
+input[type=range]{accent-color:var(--aqua)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.checks label{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;display:flex;align-items:start;gap:8px}
+.checks input{accent-color:var(--aqua);margin-top:2px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0}
+button.action{background:#21404c;border:1px solid #4a7076;border-radius:9px;color:#eff9f2;min-height:43px;font:inherit;font-weight:750;padding:8px 10px;cursor:pointer}
+button.action:hover{background:#2d5a60;border-color:var(--aqua)}
+button.action:focus-visible,.beach:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.action.primary{background:linear-gradient(120deg,#207468,#2e5c63);border-color:#71cdb8}
+button.action.gold{background:#6c522c;border-color:#d2a86b}
+.hint{font-size:11px;color:#a2c0c0;margin:10px 0 0}
+.readout{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.readout>div{background:#091b23;border:1px solid #36545c;border-radius:9px;padding:12px}
+.readout b{display:block;font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.readout span{font-size:10px;color:#97b4b5;text-transform:uppercase}
+.prob{display:flex;height:11px;border:1px solid #42626a;border-radius:10px;overflow:hidden;background:#152f38;margin-top:8px}
+#probLeft{background:#f6c077;width:50%}#probRight{background:#6be8d9;width:50%}
+.attrow{display:grid;grid-template-columns:20px 1fr 52px;align-items:center;gap:8px;margin-top:6px;font-size:11px}
+.attbar{height:8px;background:#23414c;border-radius:10px;overflow:hidden}.attbar>div{height:100%;background:#77dcd0;width:25%;transition:width .15s}
+pre{margin:10px 0 0;font:11px/1.55 ui-monospace,Consolas,monospace;color:#a3d3c7;white-space:pre-wrap;min-height:62px}
+.metrics{display:flex;gap:14px;flex-wrap:wrap;color:#bcd9d0;font-size:12px}
+.metrics b{color:var(--gold)}
+.rationale{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:17px}
+.rationale article{border:1px solid var(--line);border-radius:12px;background:#0e2831;padding:17px}
+.rationale article strong{color:var(--aqua)}.rationale p{font-size:12px;color:#bdd0cd;margin:7px 0 0}
+.formula{font:12px/1.7 ui-monospace,Consolas,monospace;white-space:pre-wrap;border:1px solid #335660;border-radius:10px;background:#071820;padding:16px;color:#d1f3e9}
+#controlResult{background:#152e36;border:1px solid #34525d;border-radius:8px;padding:12px;font-size:12px;color:#c2e7db;min-height:72px}
+.caution{border-left:2px solid var(--gold);background:#49351e50;padding:16px 20px;font-size:13px;color:#f4dec1;margin-top:18px}
+footer{margin-top:30px;border-top:1px solid var(--line);padding-top:20px;color:#9dbcb5;font-size:12px}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.stack{grid-template-columns:1fr 1fr}.stack>.panel{min-width:0}}
+@media(max-width:700px){main{padding:14px 12px 48px}.stack{grid-template-columns:1fr}.beach-grid{gap:10px}.grid-wrap{padding:0}.beach{padding:7px}.beach canvas{height:105px}.beach-head{font-size:11px;display:block}.beach-head small{display:block}nav .tabs{gap:4px}.rationale{grid-template-columns:1fr}.hero{gap:4px}.beach-grid{gap:19px}.matrix-line{font-size:9px}.matrix-cell{font-size:10px;padding:3px 1px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style></head><body><main>
+<nav><span>≈ COMPUTING BEACH <strong>/ SOL</strong></span><div class="tabs" role="navigation" aria-label="Computing Beach labs">
+<a href="./index.html">Living shore</a><a href="./online.html">Memory Drift</a><a href="./trial.html">Agent trials</a><a href="./beach-ai.html" aria-current="page">Beach AI</a><a href="https://github.com/anttiluode/ComputingBeachSol">Source</a></div></nav>
+<div class="hero">
+<div><div class="eyebrow">04 / A matrix of living shores · interactive numerical AI</div>
+<h1>One beach remembers.<br><em>Four beaches think together?</em></h1>
+<p class="lead">Strong waves write persistent material. Weak waves ask questions. Channels let one beach address another. An explicit attention reader decides which memories matter. This is the bridge from wave-written geometry to <strong>fast-weight associative AI</strong>.</p></div>
+<div class="aside"><strong>A genuine computational model, not a claim of artificial consciousness.</strong><p>Each beach has 36 material cells and 36 fast water cells. Six spatial Fourier imprints encode a 3 × 2 matrix in the material. The browser computes writes, reads, network routing and attention from those states. A separate damped wave recurrence supplies the animated fast wave field.</p></div>
+</div>
+<div class="section-title"><h2>01 / A network of four wave-written memories</h2><span class="pill" id="gating">Links open</span></div>
+<div class="layout">
+<section class="panel">
+<div class="grid-wrap">
+<svg class="links-svg" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true">
+<line id="edge01" x1="300" y1="175" x2="700" y2="175"/>
+<line id="edge02" x1="300" y1="175" x2="300" y2="525"/>
+<line id="edge13" x1="700" y1="175" x2="700" y2="525"/>
+<line id="edge23" x1="300" y1="525" x2="700" y2="525"/>
+</svg>
+<div class="beach-grid">
+<button class="beach" id="beach0" aria-pressed="true" type="button"><span class="beach-head">A / Tidal shelf <small id="writes0">0 lessons</small></span><canvas id="canvas0" aria-label="Fast wave and slow Fourier material for beach A"></canvas><div id="matrix0"></div><span class="matrix-note">material Fourier matrix · [left | right]</span></button>
+<button class="beach" id="beach1" aria-pressed="false" type="button"><span class="beach-head">B / Long inlet <small id="writes1">0 lessons</small></span><canvas id="canvas1" aria-label="Fast wave and slow Fourier material for beach B"></canvas><div id="matrix1"></div><span class="matrix-note">material Fourier matrix · [left | right]</span></button>
+<button class="beach" id="beach2" aria-pressed="false" type="button"><span class="beach-head">C / Reef pool <small id="writes2">0 lessons</small></span><canvas id="canvas2" aria-label="Fast wave and slow Fourier material for beach C"></canvas><div id="matrix2"></div><span class="matrix-note">material Fourier matrix · [left | right]</span></button>
+<button class="beach" id="beach3" aria-pressed="false" type="button"><span class="beach-head">D / South harbour <small id="writes3">0 lessons</small></span><canvas id="canvas3" aria-label="Fast wave and slow Fourier material for beach D"></canvas><div id="matrix3"></div><span class="matrix-note">material Fourier matrix · [left | right]</span></button>
+</div></div>
+<div class="metrics" style="margin-top:17px"><span><b id="lessons">0</b> teaching events</span><span id="modeTitle">Delta rule · corrective write</span><span id="probeMode">Content-sensitive attention</span></div>
+<p class="hint">Click a beach to choose where the next wave enters. Cyan is the fast field u(x,t); amber is the slow written material h(x). The six numbers below each beach are decoded <em>from its material profile</em>, not a hidden parallel weight array. Lines indicate available inter-beach routes.</p>
+</section>
+<div class="stack">
+<section class="panel"><h2>Write a lesson / send a weak ping</h2>
+<div class="fields">
+<label>Entry beach<select id="source"><option value="0">A — Tidal shelf</option><option value="1">B — Long inlet</option><option value="2">C — Reef pool</option><option value="3">D — South harbour</option></select></label>
+<label>Frequency address<select id="band"><option value="0">Long (mode 3)</option><option value="1">Mid (mode 6)</option><option value="2">Short (mode 10)</option></select></label>
+<label>Teaching target<select id="value"><option value="0">LEFT · [1,0]</option><option value="1">RIGHT · [0,1]</option></select></label>
+<label>Writing rule<select id="method"><option value="delta">Delta · subtract old response</option><option value="hebb">Hebbian · add another imprint</option></select></label>
+</div>
+<label style="margin-top:13px">Write strength η = <span id="etaNumber">0.36</span><input type="range" id="eta" min="0.05" max="0.90" step="0.01" value="0.36"></label>
+<div class="checks">
+<label><input type="checkbox" id="links" checked> Link beaches (read routes + wave coupling)</label>
+<label><input type="checkbox" id="attention" checked> Attend to strong, relevant memories</label>
+<label><input type="checkbox" id="relay"> Forward a weakened <em>teaching</em> signal to neighbours</label>
+</div>
+<div class="buttons"><button class="action primary" id="teach" type="button">Strong wave · WRITE</button><button class="action gold" id="ping" type="button">Weak wave · READ</button>
+<button class="action" id="demo" type="button">Load four lessons</button><button class="action" id="clear" type="button">Erase all material</button></div>
+<p class="hint">Reading is nondestructive. Linked access and forwarding lessons are different toggles: a message arriving elsewhere does not by itself teach that beach.</p></section>
+<section class="panel"><h2>What did the memory answer?</h2>
+<div class="readout"><div><span>Response vector</span><b id="response">[0.00, 0.00]</b></div><div><span>Largest output</span><b id="prediction">RIGHT</b></div></div>
+<div class="prob"><div id="probLeft"></div><div id="probRight"></div></div>
+<div class="metrics" style="justify-content:space-between"><span>← LEFT</span><span id="confidence">50.0%</span><span>RIGHT →</span></div>
+<p class="hint"><span id="pathMode">Connected network</span>. The confidence is a softmax of the two output components, not a calibrated probability of correctness.</p>
+<h3 style="margin-top:17px">Attention paid to each beach</h3>
+<div class="attrow"><span>A</span><div class="attbar"><div id="att0"></div></div><span id="attNum0">25%</span></div>
+<div class="attrow"><span>B</span><div class="attbar"><div id="att1"></div></div><span id="attNum1">25%</span></div>
+<div class="attrow"><span>C</span><div class="attbar"><div id="att2"></div></div><span id="attNum2">25%</span></div>
+<div class="attrow"><span>D</span><div class="attbar"><div id="att3"></div></div><span id="attNum3">25%</span></div></section>
+</div></div>
+<section class="section">
+<div class="layout">
+<section class="panel"><h2>02 / Does order actually enter the material?</h2><p style="color:#b9d3cf;font-size:13px">Write LEFT then RIGHT into the same frequency and compare with RIGHT then LEFT on a fresh cloned beach. In an additive writer the two updates commute. A corrective writer uses what was already there, so order can matter.</p>
+<button id="control" class="action primary" type="button">Run AB versus BA control</button><div id="controlResult" style="margin-top:12px">No matched control run. Try it with Hebbian or Delta selected above; the experiment evaluates both writers under the same η.</div></section>
+<section class="panel"><h2>Signals and changes</h2><pre id="eventLog" aria-live="polite"></pre><p class="hint">A strong teaching pulse changes the spatial coefficients. A weak ping reads the current coefficients; the fast wave animation propagates through links, but the mathematical memory readout is the Fourier projection of h.</p></section>
+</div></section>
+<section class="section"><div class="section-title"><h2>03 / How a beach becomes an AI component</h2><span class="pill">The math behind the metaphor</span></div>
+<div class="rationale">
+<article><strong>1 · Material is the weight matrix</strong><p>Six spatial sine and cosine gratings encode three input frequencies × two output channels. The matrix is read <em>from</em> the bed, so erasing the bed erases what was learned.</p></article>
+<article><strong>2 · A query is a weak wave</strong><p>A one-hot frequency selects a row of the stored matrix. Links let the query reach other memories, and content-dependent attention mixes their responses. A weak probe does not overwrite the bed.</p></article>
+<article><strong>3 · Learning is correcting the write</strong><p>Hebb adds a new imprint; the delta rule compares the desired answer with the old response and writes only that difference. A gated puddle could someday determine whether a physical write happens—but this page's gate is algorithmic.</p></article>
+</div>
+<div class="formula" style="margin-top:17px">h_b(x) = Σ_{key,value} W_b[key,value] φ_{key,value}(x)
+W_b[key,value] = Σ_x h_b(x) φ_{key,value}(x)      (orthonormal gratings)
+local_read_b(q) = W_bᵀ q
+
+Hebb:    ΔW_b = η · key ⊗ target
+Delta:   ΔW_b = η · key ⊗ (target − W_bᵀ key)
+
+network_read(q) = Σ_b attention_b(q, reachability) · W_bᵀ q</div>
+<div class="caution"><strong>Where the analogy stops:</strong> The water recurrence genuinely propagates and the material genuinely stores the numeric matrix, but our <em>attention</em> and <em>target-driven delta update</em> are explicit software calculations. The readout is a Fourier projection of the bed—not an observed wave echo through that bed. No spontaneous physical teacher, autonomous objective, inverse-loss wave or neural tissue is demonstrated. A real version would require a mechanism to implement both the readout and update locally under loss and finite resources.</div>
+</section>
+<footer>ComputingBeachSol · <a href="./BEACH_AI_LAB.md">Model contract and acceptance tests</a> · <a href="https://github.com/anttiluode/ComputingBeachSol">Source repository</a> · Fully local JavaScript; no Python, login, downloads or internet after load.</footer>
+</main><script src="./beach-ai.js"></script></body></html>
