@@ -62,9 +62,18 @@ The two intact WallMemoryLaw modules `wml/cavity.py` and `wml/law.py` were copie
 
 ## Open scientific questions
 
-**G2 — can an error wave teach material locally?** ArborVerb's exact discrete adjoint works for *its own* graph-edge gains. To apply it to the continuous Robin patches, derive and finite-difference-check a new cavity adjoint, then test real signed teacher-wave injection. The algebraic cross term in `(u+lambda)^2` by itself is not a proof a thresholded sediment transport step tracks a negative gradient. Report cosine, sign correctness, and threshold sweep, including nulls.
+**G2a — the Robin-wall gradient is now independently checked (numerical referee).** `beach/adjoint.py` differentiates the precise WallMemoryLaw two-level finite-difference stencil, rather than incorrectly reusing ArborVerb's edge-gain gradient. Its adjoint computes
 
-**G3 — fast wave-time gating.** A frozen linear wave equation is a state-bearing but linear read operator. To get a fast computer, add a physically motivated overtopping or local nonlinear gate and compare with ordinary linear and matched conventional nonlinear baselines. Neither G2 nor G3 is implemented here.
+```
+dJ/db_i = -(C*DT)^2 * KAPPA / (1 + DAMP*DT/2)
+          * sum_t sum_x [ counts_i(x) * u_t(x) * lambda_(t+1)(x) ]
+```
+
+For the 8-patch, 190-step finite-difference check, relative L2 error is **2.10e-8**, gradient-direction cosine **0.99999999998**, and the local forward/adjoint cross-product algebra matches to ~2e-16 relative error. Source: [G2a ledger](results/g2a_adjoint.json). Unit tests independently check all three sources and upstream forward parity. Run: `python -m beach.adjoint`.
+
+**G2b remains open: teacher-wave-induced *material writing*.** The numerical adjoint is a measurement benchmark, not itself a teacher field traveling through a physical beach. An actual time-reversed/reciprocal wave source must be realized with proper damping and port boundary conditions. Then measure whether *the thresholded signed flux's change* aligns with `-dJ/db` under a forcing sweep, including null and component controls. The interference cross term by itself does not establish a physically implemented learning rule.
+
+**G3 — fast wave-time gating.** A frozen linear wave equation is a state-bearing but linear read operator. To get a fast computer, add a physically motivated overtopping or local nonlinear gate and compare with ordinary linear and matched conventional nonlinear baselines. G2a's **discrete sensitivity check** is implemented; G2b's physical writer and G3's fast nonlinear gate are not.
 
 **Critical caveats:** the threshold, rate and source choice were designed on development worlds; one geometry, one deterministic toy fluid, 32 paired confirmatory seeds, and a simple centroid reader do not establish broad generality. Repetition on different geometries and stress laws is required. Never confuse finite-difference memory of the material with proof of a novel physical backpropagation mechanism.
 
