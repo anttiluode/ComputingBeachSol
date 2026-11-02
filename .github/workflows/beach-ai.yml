@@ -1,0 +1,34 @@
+name: Beach AI lab — material and attention regression
+on:
+  push:
+    paths:
+      - 'beach-ai.js'
+      - 'beach-ai.html'
+      - 'tests/beach-ai.test.cjs'
+      - '.github/workflows/beach-ai.yml'
+  workflow_dispatch:
+jobs:
+  mechanisms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify actual fast-weight, routing and nondestructive behavior
+        run: node tests/beach-ai.test.cjs
+      - name: Validate syntax and standalone page references
+        run: |
+          node --check beach-ai.js
+          node --check tests/beach-ai.test.cjs
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('beach-ai.html').read_text()
+          assert '<script src="./beach-ai.js"></script>' in s
+          for i in range(4):
+              assert f'id="canvas{i}"' in s
+              assert f'id="beach{i}"' in s
+          assert 'explicit software calculations' in s
+          print('page structure and scientific claim boundaries verified')
+          PY
