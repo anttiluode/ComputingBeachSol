@@ -14,7 +14,7 @@ SOURCES = (0, 1, 2)
 
 def read_features(beach: Beach, h, win=WINDOW):
     # Receiver echoes only; the decoder never observes the hidden material.
-    return np.concatenate([beach.read(h, source=s)[win[0]:win[1]] for s in SOURCES])
+    return np.concatenate([beach.read(h, source=s, drive=beach.cfg.read_drive)[win[0]:win[1]] for s in SOURCES])
 
 
 def make_pairs(beach, seeds, mode='live'):
