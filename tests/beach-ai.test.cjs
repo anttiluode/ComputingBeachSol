@@ -72,7 +72,7 @@ function mockElement(){
   getBoundingClientRect(){return {width:260,height:140}},
   getContext(){return {
     setTransform(){},clearRect(){},fillRect(){},beginPath(){},moveTo(){},
-    lineTo(){},stroke(){},fill(){},fillText(){},createLinearGradient(){
+    lineTo(){},closePath(){},stroke(){},fill(){},fillText(){},createLinearGradient(){
       return {addColorStop(){}};
     }
   }}
