@@ -1,5 +1,16 @@
 # ComputingBeachSol — a wave writes a medium, then a ping reads its history
 
+## November 2: G8 — replace runaway potential with neighbour-edge memory
+
+**[G8 frozen results](G8_RESULTS.md) · [G8 preregistration](PREREG_G8.md) · [CI reproduction](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41416660126)**
+
+The G7 local Poisson relay carried a numerically divergent **common potential** that never affected material motion. G8 stores oriented neighbour differences `q_i` instead of absolute potential `z_i` and updates them by neighbour-only diffusion. Across **16 fresh held-out K8/K48 cases**, its material updates agree with G7 to **6.96e−13** relative error, remain mass-conserving, and improve receiver loss in **16/16**. The q common mode stays effectively zero. Three preregistered gates pass.
+
+Fixed per-edge caps and leakage were also tested: a tight cap of half the externally calibrated maximum residual causes **54.8%** mean K48 direction error but still improves 8/8 tasks; a 0.01 leak per communication round causes **42.5%** K48 error. These expose latency and finite dynamic range, and the cap's global calibration remains an engineering assumption. As before, the teacher is a **numerical ideal adjoint** and the test is a **single material update**, not genuine autonomous sediment learning or a solution to multi-epoch stale thresholds.
+
+Claude's [independent G6/G7](https://github.com/anttiluode/ComputingBeachClaude) makes the critical complementary point: after multiple updates the learned normal stress becomes stale, the loud-harbour objective largely fails, and damping defeats physical teacher-wave alignment. G8 does not supersede those negative results.
+
+
 ## November 2: G6 and G7 — stress memory and local redistribution
 
 **New, reproducible numerical result:** [G6 frozen test](G6_RESULTS.md) | [G7 frozen test](G7_RESULTS.md) | [G6 protocol](PREREG_G6.md) | [G7 protocol](PREREG_G7.md).
