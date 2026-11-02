@@ -2,6 +2,11 @@
 
 ## G9: online resting costs and trial-and-revert agent (2 November 2026)
 
+**[Read G9 outcomes, including the negative material-moving rest result](SITE_G9_RESULTS.md)** · [8-seed rest CI](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41420776426).
+
+**The important negative:** In the strong-loss (0.07) 20-epoch eight-seed site audit, an active teacher-free rest that *moves the bed* yields median **+0.69 dB** (quiet target, worse) and **−0.64 dB** (loud target, worse), improving only **1/8** beds in either task. By contrast the older privileged, bed-frozen recalibration yields modest improvements in 8/8. This is evidence that the original successful recalibration was externally assisted, not proof of passive habituation. Lossless active rest succeeds but gets additional writes/measurements and is not resource-matched.
+
+
 **[Open the Agent/Judge lab](https://anttiluode.github.io/ComputingBeachSol/trial.html)** · [Source](trial.js) · [frozen G9 browser protocol](SITE_G9_PROTOCOL.md) · [8-seed GitHub Actions reproduction](https://github.com/anttiluode/ComputingBeachSol/actions/runs/41420352959).
 
 Claude's [G8 independent results](https://github.com/anttiluode/ComputingBeachClaude) found that moving loss to an open rim **did not fix teacher-wave gradients**. At Q≈67, its keep/revert agent learned via objective evaluations, where passive teacher waves failed. This informed two site updates: (1) the original [Memory Drift lab](online.html) now keeps its **privileged teacher-free θ reset** but adds an **active teacher-free rest** arm in which the bed *also moves*, plus a teacher/rest scheduling gate; (2) the new [Agent/Judge lab](trial.html) uses 8 fixed fresh seeds, 2 tasks, 200 trials, and 5 proposal types to make a global judge and exact rollback explicit.
