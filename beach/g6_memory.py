@@ -91,8 +91,6 @@ def single_case(beach, seed, steps=STEPS, baseline_episodes=CALIBRATION_EPISODES
     e_neg = patch_energy(beach, u - boost * lam)
     # No target or gradient is ever used to construct the baseline.
     theta = remember(np.zeros_like(e_u), e_u, baseline_episodes)
-    wrong_u, _ = propagate(beach.cav, bits, source=(source + 1) % 3,
-                           steps=steps, store_states=True)
     # propagate returns states, with states[0] = the initial wave.
     _, wrong_states = propagate(beach.cav, bits,
                                 source=(source + 1) % 3, steps=steps,
