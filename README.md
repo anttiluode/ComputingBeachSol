@@ -6,6 +6,26 @@ The challenge comes from [Evening](https://github.com/anttiluode/Evening) (posit
 
 **Important:** The beach is presently a **patch-scale numerical analog**, not a hydrodynamic beach. The effective transport is **not** a calibrated Exner/Shields sand law. Nothing here demonstrates actual sediment backpropagation or a new physical effect.
 
+## November 2 follow-up — resolution, common-tail memory and gradient-matched writing
+
+**[Read the complete Round 3 report](ROUND3_RESULTS.md)** · [Frozen K/G2c protocol](PREREG_ROUND3.md) · [Frozen fair G2d protocol](PREREG_G2D.md) · [Machine-readable results](results/round3_summary.json) · [Fair G2d results](results/g2d_summary.json).
+
+**G1b/c (32 paired held-out seeds per resolution):** ABX versus BAX with an identical strong final wave X is recovered from *late* receiver echoes at **100%, 100%, 100%, 95.3%** for K = **8,16,24,48**, respectively. Early-window ABX accuracy is **95.3%, 100%, 82.8%, 76.6%**. All first arrivals are at step 122; no-signal pre-arrival decoding is an informed tie scored 50%. Fixed-operator writes commute to within 3e-15. **K is not a pure dimensionality intervention:** it also changes patch widths and markedly changes transport activity. Late echoes beating early echoes does not refute the causal scattering-tour limit.
+
+**G2c (16 held-out seeds):** two-phase energy contrast with an *ideal numerical adjoint* matches the projected negative gradient (cosine **0.999992**), and improves echo loss 16/16. The actually local conservative downhill flux **fails** (cosine −0.841; 0/16 improvements). Original E5 comparing conserving contrast against **unconstrained** natural erosion failed 8/16 and remains failed; that control was not equally mass-constrained.
+
+**G2d (16 new held-out seeds, frozen separately):** fair comparison against **mean-projected natural erosion** passes: gradient-matched contrast beats the conserving natural writer **16/16**, and beats conserving single-exposure erosion **16/16**, at equal material step norm. **Still not autonomous physical learning.** The teacher is numerically generated, two energy measurements are subtracted externally, and mass projection is global rather than a local sediment flux. None of the work models calibrated real sand.
+
+Reproduce locally:
+
+```powershell
+python3.13 -m beach.g1b_batch --gather --out results/g1b_reproduced.json   # after batch caches are generated
+python3.13 -m beach.energy_writer --phase confirm
+python3.13 -m beach.g2d
+```
+
+The [round3](.github/workflows/confirm-round3.yml) and [G2d](.github/workflows/confirm-g2d.yml) GitHub Actions workflows build/verify the complete frozen held-out ledgers automatically.
+
 ## Status: G1 passes, G2a passes, G2b **fails** in the tested signed-transport model
 
 - **G1 (history)**: 62/64 fresh noisy receiver echoes decode AB versus BA; frozen-operator control 50%.
