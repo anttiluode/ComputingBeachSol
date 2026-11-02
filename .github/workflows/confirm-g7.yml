@@ -1,0 +1,44 @@
+name: G7 frozen local relay test
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'PREREG_G7.md'
+      - 'beach/g7_local.py'
+      - '.github/workflows/confirm-g7.yml'
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - name: Run frozen K8/K48 eight-pair seed benchmark
+        run: OPENBLAS_NUM_THREADS=1 python -m beach.g7_local --phase confirm --out results/g7_reproduced.json
+      - name: Verify locked protocol and reproducibility without hiding hypothesis failures
+        run: |
+          python - <<'PY'
+          import json, math
+          r=json.load(open('results/g7_reproduced.json'))
+          assert r['protocol']=='PREREG_G7.md'
+          assert r['seeds']==list(range(1900,1908))
+          assert r['K']==[8,48] and r['relay_alpha']==.2
+          assert r['rounds']==[0,4,16,64,256,1024,4096]
+          assert r['neighbor_only_redistribution'] is True
+          assert r['normalization_is_external'] is True
+          assert len(r['per_seed'])==16
+          assert all(math.isfinite(x['oracle']['loss_ratio']) for x in r['per_seed'])
+          assert set(r['summary']['gates'])=={
+              'G7_A_local_conservation_and_zero_rounds',
+              'G7_B_K8_at_64','G7_C_spatial_latency',
+              'G7_D_K48_at_4096','G7_E_matched_loss_vs_global_oracle'}
+          print('Locked outcomes (FAIL is an allowed scientific finding):',r['summary']['gates'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g7-locked-per-seed
+          path: results/g7_reproduced.json
